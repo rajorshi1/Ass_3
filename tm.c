@@ -18,7 +18,7 @@ asmlinkage long new_sys_task_module(pid_t pid)
     }
     printk("PID: %d\n", task->pid);
     printk("Command Path: %s\n", task->comm);
-    return original_call(pid);
+    return ref_sys_getgpid(pid);
 }
 
 static unsigned long **aquire_sys_call_table(void)
