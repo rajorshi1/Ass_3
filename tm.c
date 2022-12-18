@@ -8,7 +8,7 @@ unsigned long **sys_call_table;
 unsigned long original_cr0;
 
 asmlinkage long (*ref_sys_getgpid)(pid_t pid);
-asmlinkage long sys_task_module(pid_t pid)
+asmlinkage long new_sys_task_module(pid_t pid)
 {
     struct task_struct *task;
     task = pid_task(find_vpid(pid), PIDTYPE_PID);
@@ -41,7 +41,7 @@ static int __init tm_init(void)
     original_cr0 = read_cr0();
     write_cr0(original_cr0 & ~0x00010000);
     ref_sys_getgpid = (void *)sys_call_table[__NR_getgpid];
-    sys_call_table[__NR_getgpid] = (unsigned long *)sys_task_module;
+    sys_call_table[__NR_getgpid] = (unsigned long *)new_sys_task_module;
     write_cr0(original_cr0);
     return 0;
 }
