@@ -1,16 +1,15 @@
-#include <linux/kernel.h>
 #include <linux/module.h>
-#include <linux/moduleparam.h>
-#include <linux/unistd.h>
-#include <linux/sched.h>
-#include <asm/uaccess.h>
+#include <linux/kernel.h>
+#include <linux/syscalls.h>
+#include <linux/delay.h>
+#include <asm/paravirt.h>
 
-extern void *sys_call_table[];
+unsigned long **sys_call_table;
+unsigned long original_cr0;
 
-static int uid;
-module_param(uid, int, 0644);
-asmlinkage int (*original_call) (const char *, int, int);
-asmlinkage int task_module(pid_t pid) {
+asmlinkage long (*ref_sys_getgpid)(pid_t pid);
+asmlinkage long sys_task_module(pid_t pid)
+{
     struct task_struct *task;
     task = pid_task(find_vpid(pid), PIDTYPE_PID);
     if (task == NULL) {
@@ -19,23 +18,47 @@ asmlinkage int task_module(pid_t pid) {
     }
     printk("PID: %d\n", task->pid);
     printk("Command Path: %s\n", task->comm);
-    return original_call(source, destination);
+    return original_call(pid);
 }
 
-static int __init tm_init() {
-    original_call = sys_call_table[__NR_kernel_2D_memcpy];
-    sys_call_table[__NR_kernel_2D_memcpy] = task_module;
-    printk(KERN_INFO "Spying on UID:%d\n", uid);
+static unsigned long **aquire_sys_call_table(void)
+{
+    unsigned long int offset = PAGE_OFFSET;
+    unsigned long **sct;
+    while (offset < ULLONG_MAX) {
+        sct = (unsigned long **)offset;
+        if (sct[__NR_getgpid] == (unsigned long *) sys_getgpid)
+            return sct;
+        offset += sizeof(void *);
+    }
+    return NULL;
+}
+
+static int __init tm_init(void)
+{
+    if(!(sys_call_table = aquire_sys_call_table()))
+        return -1;
+    original_cr0 = read_cr0();
+    write_cr0(original_cr0 & ~0x00010000);
+    ref_sys_getgpid = (void *)sys_call_table[__NR_getgpid];
+    sys_call_table[__NR_getgpid] = (unsigned long *)sys_task_module;
+    write_cr0(original_cr0);
     return 0;
 }
 
-static void __exit tm_exit() {
-    if (sys_call_table[__NR_kernel_2D_memcpy] != task_module) {
-        printk(KERN_ALERT "Bruh Moment");
+static void __exit tm_exit(void)
+{
+    if(!sys_call_table) {
+        return;
     }
-    sys_call_table[__NR_kernel_2D_memcpy] = original_call;
+    write_cr0(original_cr0 & ~0x00010000);
+    sys_call_table[__NR_getgpid] = (unsigned long *)ref_sys_getgpid;
+    write_cr0(original_cr0);
+    msleep(2000);
 }
 
 module_init(tm_init);
 module_exit(tm_exit);
 MODULE_LICENSE("GPL");
+
+
