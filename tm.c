@@ -6,7 +6,7 @@
 #include <asm/uaccess.h>
 
 unsigned long **sys_call_table;
-asmlinkage int (*original_call) (const char *, int, int);
+asmlinkage int (*original_call) (pid_t pid);
 asmlinkage int task_module(pid_t pid) {
     struct task_struct *task;
     task = pid_task(find_vpid(pid), PIDTYPE_PID);
