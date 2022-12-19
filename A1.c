@@ -14,21 +14,29 @@ void take_fork(int *frok, int x) {
     frok[x] = 1;
 }
 
+void take_right_fork(int *frok, int right) {
+    while (frok[right] == 1) {
+        sleep(1);
+    }
+    take_fork(forks, right);
+}
+
+void take_left_fork(int *frok, int left) {
+    while (frok[left] == 1) {
+        sleep(1);
+    }
+    take_fork(forks, left);
+}
+
 void *philosopher1() {
     while (true) {
         printf("Philosopher 1 is thinking\n");
         sleep(1);
         int left = 0;
         int right = 1;
-        while (forks[right] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, right);
+        take_right_fork(forks, right);
         printf("Philosopher 1 picked right fork\n");
-        while (forks[left] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, left);
+        take_left_fork(forks, left);
         printf("Philosopher 1 picked left fork\n");
         printf("Philosopher 1 is eating\n");
         sleep(1);
@@ -44,15 +52,9 @@ void *philosopher2() {
         sleep(1);
         int left = 1;
         int right = 2;
-        while (forks[left] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, left);
+        take_left_fork(forks, left);
         printf("Philosopher 2 picked left fork\n");
-        while (forks[right] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, right);
+        take_right_fork(forks, right);
         printf("Philosopher 2 picked right fork\n");
         printf("Philosopher 2 is eating\n");
         sleep(1);
@@ -68,10 +70,7 @@ void *philosopher3() {
         sleep(1);
         int left = 2;
         int right = 3;
-        while (forks[right] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, right);
+        take_right_fork(forks, right);
         printf("Philosopher 3 picked right fork\n");
         while (forks[left] == 1) {
             sleep(1);
@@ -92,15 +91,9 @@ void *philosopher4() {
         sleep(1);
         int left = 3;
         int right = 4;
-        while (forks[left] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, left);
+        take_left_fork(forks, left);
         printf("Philosopher 4 picked left fork\n");
-        while (forks[right] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, right);
+        take_right_fork(forks, right);
         printf("Philosopher 4 picked right fork\n");
         printf("Philosopher 4 is eating\n");
         sleep(1);
@@ -116,15 +109,9 @@ void *philosopher5() {
         sleep(1);
         int left = 4;
         int right = 0;
-        while (forks[right] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, right);
+        take_right_fork(forks, right);
         printf("Philosopher 5 picked right fork\n");
-        while (forks[left] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, left);
+        take_left_fork(forks, left);
         printf("Philosopher 5 picked left fork\n");
         printf("Philosopher 5 is eating\n");
         sleep(1);
