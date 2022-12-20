@@ -12,22 +12,15 @@
 
 #define NAME "/tmp/sock"
 
-struct myData
-{
-    char stringArray[5][5];
-    int indexArray[5];
-    int Index;
-};
-
-void getCharArrays(int Index, char toBeSent[5][5], char stringArray[50][5], int indexArr[])
-{
+void getCharArrays(int Index, char toBeSent[5][6], char stringArray[50][5]) {
     for (int i = Index; i < Index + 5; i++) {
-        for (int j=0; j<5; j++) {
-            toBeSent[i-Index][j] = stringArray[i][j];
+        for (int j=0; j<6; j++) {
+            if (j==5) toBeSent[i-Index][j] = i;
+            else toBeSent[i-Index][j] = stringArray[i][j];
         }
-        indexArr[i-Index] = i;
     }
 }
+
 void printCharArray(char toBeSent[5][5])
 {
     for (int i = 0; i < 5; i++) {
@@ -37,33 +30,24 @@ void printCharArray(char toBeSent[5][5])
         printf("\n");
     }
 }
+
 void randomStringGenerator(char stringArray[50][5])
 {
     srand(time(NULL));
     for (int i = 0; i < 50; i++)
     {
-        for (int j = 0; j < 3; j++)
+        for (int j = 0; j < 5; j++)
         {
             stringArray[i][j] = rand() % 26 + 65;
         }
     }
-}
-struct myData messageStructure(char stringArray[50][5], char toBeSent[5][5], int indexArray[5], int Index)
-{
-    struct myData data;
-    getCharArrays(Index, toBeSent, stringArray, indexArray);
-    memcpy(data.indexArray, indexArray, sizeof(int) * 5);
-    memcpy(data.stringArray, stringArray, sizeof(char) * 25);
-    return (data);
 }
 
 int main(int argc, char const *argv[])
 {
     char stringArray[50][5] = {{0}};
     randomStringGenerator(stringArray);
-    char toBeSent[5][5];
-    int indexArr[5];
-    int Index;
+    char toBeSent[5][6];
     int sock, msgsock;
     struct sockaddr_un server;
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -92,8 +76,8 @@ int main(int argc, char const *argv[])
         struct timespec after;
         clock_gettime(CLOCK_MONOTONIC, &before);
         for (int i=0; i<10; i++) {
-            struct myData data1 = messageStructure(stringArray, toBeSent, indexArr, receivedIndex+1);
-            write(msgsock, (void *)&data1, 52);
+            getCharArrays(receivedIndex + 1, toBeSent, stringArray);
+            write(msgsock, (void *)&toBeSent, sizeof(char)*30);
             read(msgsock,&receivedIndex,sizeof(int));
             printf("The recieved index from P2 is %d\n",receivedIndex);
         }
