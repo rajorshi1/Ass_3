@@ -11,7 +11,7 @@ int fork4 = 3;
 int fork5 = 4;
 
 int free_fork(int spoon) {
-    return = 0;
+    return 0;
 }
 
 int take_fork(int spoon) {
