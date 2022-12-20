@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sock < 0)
     {
-        perror("opening stream socket");
+        perror("Socket Opened");
         exit(1);
     }
     server.sun_family = AF_UNIX;
@@ -37,7 +37,7 @@ int main(int argc, char const *argv[])
     if (connect(sock, (struct sockaddr *)&server, sizeof(struct sockaddr_un)) < 0)
     {
         close(sock);
-        perror("connecting stream socket");
+        perror("Socket Connecting\n");
         exit(1);
     }
     char buff[5][6];
