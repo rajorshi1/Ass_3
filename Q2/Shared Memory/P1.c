@@ -1,59 +1,71 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <sys/un.h>
-#include <fcntl.h>
-#include <string.h>
-#include <sys/shm.h>
+#include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
-void getCharArrays(int Index, char toBeSent[5][6], char stringArray[50][5]) {
-    for (int i = Index; i < Index + 5; i++) {
-        for (int j=0; j<6; j++) {
-            if (j==5) toBeSent[i-Index][j] = i;
-            else toBeSent[i-Index][j] = stringArray[i][j];
+void getCharArrays(int Index, char toBeSent[5][5], char stringArray[50][5], int indexArr[])
+{
+    for (int i = Index; i < Index + 5; i++)
+    {
+        for (int j=0; j<5; j++) {
+            toBeSent[i-Index][j] = stringArray[i][j];
         }
+        indexArr[i-Index] = i;
     }
 }
-
-void printArraydet(char array[6]) {
-    printf("Max index received from P2: %d ",array[5]);
-    for(int j = 0 ; j < 5; j++){
-        printf("%c",array[j]);
+void printCharArray(char toBeSent[5][5])
+{
+    for (int i = 0; i < 5; i++) {
+        for (int j=0; j<5; j++) {
+            printf("%c", toBeSent[i][j]);
+        }
+        printf("\n");
     }
-    printf("\n");
 }
-
-void randomStringGenerator(char stringArray[50][5]) {
+void randomStringGenerator(char stringArray[50][5])
+{
     srand(time(NULL));
-    for (int i = 0; i < 50; i++) {
-        for (int j = 0; j < 5; j++) {
+    for (int i = 0; i < 50; i++)
+    {
+        for (int j = 0; j < 5; j++)
+        {
             stringArray[i][j] = rand() % 26 + 65;
         }
     }
 }
-
 int main() {
-    sleep(1);
-    char buff[6];
-    char arrstr[50][5];
-    randomStringGenerator(arrstr);
-    char toBeSent[5][6];
+
+    char stringArray[50][5] = {{0}};
+    randomStringGenerator(stringArray);
+    char toBeSent[5][5];
+    int indexArr[5];
+    mkfifo("fifoString", 0777);
+    mkfifo("fifoIndex", 0777);
     int receivedIndex = -1;
-    int mem = shmget(6969,100,IPC_CREAT | 0666);
-    char *ptr = (char *)shmat(mem,NULL,0);
+    struct timespec before;
+    struct timespec after;
+    clock_gettime(CLOCK_MONOTONIC, &before);
     for (int i=0; i<10; i++) {
-        getCharArrays(receivedIndex+1, toBeSent, arrstr);
-        for(int j = 0 ; j < 5 ; j++){
-            strcpy(ptr,toBeSent[j]);
-            sleep(1);
-        }
-        strcpy(buff,ptr);
-        sleep(1);
-        printArraydet(buff);
-        receivedIndex = buff[5];
+        int fd = open("fifoString", O_WRONLY);
+        getCharArrays(receivedIndex+1, toBeSent, stringArray, indexArr);
+        write(fd, toBeSent, sizeof(char) * 25);
+        close(fd);
+        int fd2 = open("fifoIndex", O_WRONLY);
+        write(fd2, indexArr, sizeof(int) * 5);
+        close(fd2);
+        fd = open("fifoString", O_RDONLY);
+        read(fd, &receivedIndex, sizeof(int));
+        printf("Received Index %d from P2\n", receivedIndex);
+        close(fd);
     }
-    printf("Transfer Complete \n");
+    clock_gettime(CLOCK_MONOTONIC, &after);
+    unsigned long time1 = (before.tv_sec * 1000000000) + before.tv_nsec;
+    unsigned long time2 = (after.tv_sec * 1000000000) + after.tv_nsec;
+    float time_taken = ((float)(time2 - time1))/1000000000;
+    printf("Time taken to acknowledge all strings: %f\n", time_taken);
+    return 0;
 }
