@@ -40,7 +40,7 @@ void *philosopher2() {
         sleep(1);
         sem_post(&fork2);
         printf("Philosopher 2 placed left fork back\n");
-        sem_post(&forks3);
+        sem_post(&fork3);
         printf("Philosopher 2 placed right fork back\n");
     }
 }
