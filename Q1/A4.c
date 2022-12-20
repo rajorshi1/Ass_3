@@ -4,7 +4,8 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-int forks[7];
+int forks[5];
+int bowls[2];
 
 void free_fork(int *frok, int x) {
     frok[x] = 0;
@@ -38,11 +39,11 @@ void *philosopher1() {
         printf("Philosopher 1 picked right fork\n");
         take_left_fork(forks, left);
         printf("Philosopher 1 picked left fork\n");
-        take_right_fork(forks, 5);
+        take_right_fork(bowls, 0);
         printf("Philosopher 1 picked a sauce bowl\n");
         printf("Philosopher 1 is eating\n");
         sleep(1);
-        free(forks, 5);
+        free_fork(bowls, 0);
         printf("Philosopher 1 placed the sauce bowl back\n");
         free_fork(forks, left);
         printf("Philosopher 1 placed left fork back\n");
@@ -60,11 +61,11 @@ void *philosopher2() {
         printf("Philosopher 2 picked left fork\n");
         take_right_fork(forks, right);
         printf("Philosopher 2 picked right fork\n");
-        take_right_fork(forks, 6);
+        take_right_fork(bowls, 1);
         printf("Philosopher 2 picked a sauce bowl\n");
         printf("Philosopher 2 is eating\n");
         sleep(1);
-        free(forks, 6);
+        free_fork(bowls, 1);
         printf("Philosopher 2 placed the sauce bowl back\n");
         free_fork(forks, left);
         printf("Philosopher 2 placed left fork back\n");
@@ -82,11 +83,11 @@ void *philosopher3() {
         printf("Philosopher 3 picked right fork\n");
         take_left_fork(forks, right);
         printf("Philosopher 3 picked left fork\n");
-        take_right_fork(forks, 5);
+        take_right_fork(bowls, 0);
         printf("Philosopher 3 picked a sauce bowl\n");
         printf("Philosopher 3 is eating\n");
         sleep(1);
-        free(forks, 5);
+        free_fork(bowls, 0);
         printf("Philosopher 3 placed the sauce bowl back\n");
         free_fork(forks, left);
         printf("Philosopher 3 placed left fork back\n");
@@ -104,11 +105,11 @@ void *philosopher4() {
         printf("Philosopher 4 picked left fork\n");
         take_right_fork(forks, right);
         printf("Philosopher 4 picked right fork\n");
-        take_right_fork(forks, 6);
+        take_right_fork(bowls, 1);
         printf("Philosopher 4 picked a sauce bowl\n");
         printf("Philosopher 4 is eating\n");
         sleep(1);
-        free(forks, 6);
+        free_fork(bowls, 1);
         printf("Philosopher 4 placed the sauce bowl back\n");
         free_fork(forks, left);
         printf("Philosopher 4 placed left fork back\n");
@@ -126,11 +127,11 @@ void *philosopher5() {
         printf("Philosopher 5 picked right fork\n");
         take_left_fork(forks, left);
         printf("Philosopher 5 picked left fork\n");
-       take_right_fork(forks, 5);
+        take_right_fork(bowls, 0);
         printf("Philosopher 5 picked a sauce bowl\n");
         printf("Philosopher 5 is eating\n");
         sleep(1);
-        free(forks, 5);
+        free_fork(bowls, 0);
         printf("Philosopher 5 placed the sauce bowl back\n");
         free_fork(forks, left);
         printf("Philosopher 5 placed left fork back\n");
@@ -140,8 +141,11 @@ void *philosopher5() {
 }
 
 int main(int argc, char *argv[]) {
-    for (int i = 0; i < 7; i++) {
+    for (int i = 0; i < 5; i++) {
         forks[i] = 0;
+    }
+    for (int i=0; i < 2; i++) {
+        bowls[i] = 0;
     }
     pthread_t p1, p2, p3, p4, p5;
     pthread_create(&p1, NULL, philosopher1, NULL);
