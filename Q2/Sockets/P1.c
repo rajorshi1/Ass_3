@@ -53,14 +53,14 @@ int main(int argc, char const *argv[])
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sock < 0)
     {
-        printf("Socket making failed\n");
+        printf("Socket Failure\n");
         exit(1);
     }
     server.sun_family = AF_UNIX;
     strcpy(server.sun_path, NAME);
     if (bind(sock, (struct sockaddr *)&server, sizeof(struct sockaddr_un)))
     {
-        perror("binding stream socket");
+        perror("Binding Failure\n");
         unlink(NAME);
         exit(1);
     }
@@ -70,7 +70,7 @@ int main(int argc, char const *argv[])
     msgsock = accept(sock, 0, 0);
     setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     if (msgsock == -1)
-        printf("Socket error\n");
+        printf("Error in Socket\n");
     else {
         struct timespec before;
         struct timespec after;
