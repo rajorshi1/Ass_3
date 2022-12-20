@@ -7,17 +7,16 @@
 #include <stdlib.h>
 #include <time.h>
 
-void getCharArrays(int Index, char toBeSent[5][5], char stringArray[50][5], int indexArr[])
-{
-    for (int i = Index; i < Index + 5; i++)
-    {
-        for (int j=0; j<5; j++) {
-            toBeSent[i-Index][j] = stringArray[i][j];
+void getCharArrays(int Index, char toBeSent[5][6], char stringArray[50][5]) {
+    for (int i = Index; i < Index + 5; i++) {
+        for (int j=0; j<6; j++) {
+            if (j==5) toBeSent[i-Index][j] = i;
+            else toBeSent[i-Index][j] = stringArray[i][j];
         }
-        indexArr[i-Index] = i;
     }
 }
-void printCharArray(char toBeSent[5][5])
+
+void printCharArray(char toBeSent[5][6])
 {
     for (int i = 0; i < 5; i++) {
         for (int j=0; j<5; j++) {
@@ -26,8 +25,8 @@ void printCharArray(char toBeSent[5][5])
         printf("\n");
     }
 }
-void randomStringGenerator(char stringArray[50][5])
-{
+
+void randomStringGenerator(char stringArray[50][5]){
     srand(time(NULL));
     for (int i = 0; i < 50; i++)
     {
@@ -37,26 +36,21 @@ void randomStringGenerator(char stringArray[50][5])
         }
     }
 }
-int main() {
 
+int main() {
     char stringArray[50][5] = {{0}};
     randomStringGenerator(stringArray);
-    char toBeSent[5][5];
-    int indexArr[5];
+    char toBeSent[5][6];
     mkfifo("fifoString", 0777);
-    mkfifo("fifoIndex", 0777);
     int receivedIndex = -1;
     struct timespec before;
     struct timespec after;
     clock_gettime(CLOCK_MONOTONIC, &before);
     for (int i=0; i<10; i++) {
         int fd = open("fifoString", O_WRONLY);
-        getCharArrays(receivedIndex+1, toBeSent, stringArray, indexArr);
-        write(fd, toBeSent, sizeof(char) * 25);
+        getCharArrays(receivedIndex+1, toBeSent, stringArray);
+        write(fd, toBeSent, sizeof(char) * 30);
         close(fd);
-        int fd2 = open("fifoIndex", O_WRONLY);
-        write(fd2, indexArr, sizeof(int) * 5);
-        close(fd2);
         fd = open("fifoString", O_RDONLY);
         read(fd, &receivedIndex, sizeof(int));
         printf("Received Index %d from P2\n", receivedIndex);
