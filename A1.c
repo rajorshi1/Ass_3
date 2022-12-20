@@ -72,10 +72,7 @@ void *philosopher3() {
         int right = 3;
         take_right_fork(forks, right);
         printf("Philosopher 3 picked right fork\n");
-        while (forks[left] == 1) {
-            sleep(1);
-        }
-        take_fork(forks, left);
+        take_left_fork(forks, left);
         printf("Philosopher 3 picked left fork\n");
         printf("Philosopher 3 is eating\n");
         sleep(1);
