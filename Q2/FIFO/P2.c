@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void printCharArray(char toBeSent[5][5]){
+void printCharArray(char toBeSent[5][6]){
     printf("The strings received from P1: \n");
     for (int i = 0; i < 5; i++) {
         for (int j=0; j<5; j++) {
@@ -14,29 +14,18 @@ void printCharArray(char toBeSent[5][5]){
         printf(" ");
     }
     printf("\n");
+    printf("Max Index received from P1: %d\n", toBeSent[4][5]);
 }
-void printIndexArray(int toBeSent[5]){
-    printf("The string index received from P1: \n");
-    for (int i = 0; i < 5; i++)
-    {
-        printf("%d ",toBeSent[i]);
-    }
-    printf("\n");
-}
+
 int main()
 {
-    int indexArr[5];
-    char destArr[5][5];
+    char destArr[5][6];
     for (int i=0; i<10; i++) {
         int fd = open("fifoString", O_RDONLY);
-        read(fd, &destArr, sizeof(char)*25);
+        read(fd, &destArr, sizeof(char)*30);
         close(fd);
         printCharArray(destArr);
-        int fd2= open("fifoIndex",O_RDONLY);
-        read(fd2,indexArr,sizeof(int)*5);
-        close(fd2);
-        printIndexArray(indexArr);
-        int temp = indexArr[4];
+        int temp = destArr[4][5];
         fd = open("fifoString", O_WRONLY);
         write(fd, &temp, sizeof(int));
         close(fd);
