@@ -5,16 +5,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-void printCharArray(char toBeSent[5][6]){
+void printCharArray(char buff[5][6]){
     printf("The strings received from P1: \n");
     for (int i = 0; i < 5; i++) {
         for (int j=0; j<5; j++) {
-            printf("%c",toBeSent[i][j]);
+            printf("%c",buff[i][j]);
         }
         printf(" ");
     }
     printf("\n");
-    printf("Max Index received from P1: %d\n", toBeSent[4][5]);
+    printf("Max Index received from P1: %d\n", buff[4][5]);
 }
 
 int main()
