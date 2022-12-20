@@ -8,27 +8,17 @@
 #include <sys/stat.h>
 #include <stdlib.h>
 #include <time.h>
-struct myData
-{
-    char stringArray[5][5];
-    int indexArray[5];
-    int Index;
-};
-void printCharArray(char toBeSent[5][5]){
+
+void printCharArray(char buff[5][6]){
     printf("The strings received from P1: \n");
-    for (int i = 0; i < 5; i++)
-    {
-        printf("%s ",toBeSent[i]);
+    for (int i = 0; i < 5; i++) {
+        for (int j=0; j<5; j++) {
+            printf("%c", buff[i][j]);
+        }
+        printf(" ");
     }
     printf("\n");
-}
-void printIndexArray(int toBeSent[5]){
-    printf("The string index received from P1: \n");
-    for (int i = 0; i < 5; i++)
-    {
-        printf("%d ",toBeSent[i]);
-    }
-    printf("\n");
+    printf("Max Index Received from P1: %d\n", buff[4][5]);
 }
 
 int main(int argc, char const *argv[])
@@ -50,12 +40,11 @@ int main(int argc, char const *argv[])
         perror("connecting stream socket");
         exit(1);
     }
-    struct myData data1;
+    char buff[5][6];
     for (int i=0; i<10; i++) {
-        read(sock,(void*)&data1,52);
-        printCharArray(data1.stringArray);
-        printIndexArray(data1.indexArray);
-        Index = data1.indexArray[4];
+        read(sock,(void*)&buff,sizeof(char)*30);
+        printCharArray(buff);
+        Index = buff[4][5];
         write(sock,&Index,sizeof(int));
     }
     close(sock);
