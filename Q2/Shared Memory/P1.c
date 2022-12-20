@@ -42,11 +42,8 @@ int main() {
     randomStringGenerator(arrstr);
     char toBeSent[5][6];
     int receivedIndex = -1;
-    int mem = shmget(6969,100,IPC_CREAT | 0666);
+    int mem = shmget(9999,100,IPC_CREAT | 0666);
     char *ptr = (char *)shmat(mem,NULL,0);
-    struct timespec before;
-    struct timespec after;
-    clock_gettime(CLOCK_MONOTONIC, &before);
     for (int i=0; i<10; i++) {
         getCharArrays(receivedIndex+1, toBeSent, arrstr);
         for(int j = 0 ; j < 5 ; j++){
@@ -58,10 +55,5 @@ int main() {
         printArraydet(buff);
         receivedIndex = buff[5];
     }
-    printf("Transfer Complete \n");
-    clock_gettime(CLOCK_MONOTONIC, &after);
-    unsigned long time1 = (before.tv_sec * 1000000000) + before.tv_nsec;
-    unsigned long time2 = (after.tv_sec * 1000000000) + after.tv_nsec;
-    float time_taken = ((float)(time2 - time1))/1000000000;
-    printf("Time taken to acknowledge all strings: %f\n", time_taken);
+    printf("Transfer Complete \n");
 }
