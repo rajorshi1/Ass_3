@@ -12,42 +12,42 @@
 
 #define NAME "/tmp/sock"
 
-void getCharArrays(int Index, char toBeSent[5][6], char stringArray[50][5]) {
+void getCharArrays(int Index, char Buff[5][6], char arrstr[50][5]) {
     for (int i = Index; i < Index + 5; i++) {
         for (int j=0; j<6; j++) {
-            if (j==5) toBeSent[i-Index][j] = i;
-            else toBeSent[i-Index][j] = stringArray[i][j];
+            if (j==5) Buff[i-Index][j] = i;
+            else Buff[i-Index][j] = arrstr[i][j];
         }
     }
 }
 
-void printCharArray(char toBeSent[5][5])
+void printCharArray(char Buff[5][5])
 {
     for (int i = 0; i < 5; i++) {
         for (int j=0; j<5; j++) {
-            printf("%c", toBeSent[i][j]);
+            printf("%c", Buff[i][j]);
         }
         printf("\n");
     }
 }
 
-void randomStringGenerator(char stringArray[50][5])
+void randomStringGenerator(char arrstr[50][5])
 {
     srand(time(NULL));
     for (int i = 0; i < 50; i++)
     {
         for (int j = 0; j < 5; j++)
         {
-            stringArray[i][j] = rand() % 26 + 65;
+            arrstr[i][j] = rand() % 26 + 65;
         }
     }
 }
 
 int main(int argc, char const *argv[])
 {
-    char stringArray[50][5] = {{0}};
-    randomStringGenerator(stringArray);
-    char toBeSent[5][6];
+    char arrstr[50][5] = {{0}};
+    randomStringGenerator(arrstr);
+    char Buff[5][6];
     int sock, msgsock;
     struct sockaddr_un server;
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
@@ -76,8 +76,8 @@ int main(int argc, char const *argv[])
         struct timespec after;
         clock_gettime(CLOCK_MONOTONIC, &before);
         for (int i=0; i<10; i++) {
-            getCharArrays(receivedIndex + 1, toBeSent, stringArray);
-            write(msgsock, (void *)&toBeSent, sizeof(char)*30);
+            getCharArrays(receivedIndex + 1, Buff, arrstr);
+            write(msgsock, (void *)&Buff, sizeof(char)*30);
             read(msgsock,&receivedIndex,sizeof(int));
             printf("The recieved index from P2 is %d\n",receivedIndex);
         }
