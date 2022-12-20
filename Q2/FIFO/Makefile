@@ -3,5 +3,5 @@ P1:
       gcc P1.c -o P1
 P2:
       gcc P2.c -o P2
-P:
+p:
       gcc P3.c -o p 
