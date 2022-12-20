@@ -97,7 +97,7 @@ void *philosopher5() {
     while (true) {
         printf("Philosopher 5 is thinking\n");
         sleep(1);
-        sem_wait(&forks5);
+        sem_wait(&fork5);
         printf("Philosopher 5 picked left fork\n");
         sem_wait(&fork1);
         printf("Philosopher 5 picked right fork\n");
