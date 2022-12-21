@@ -1,0 +1,39 @@
+#include <linux/kernel.h>
+#include <linux/sched.h>
+#include <linux/syscalls.h>
+#include <linux/module.h>     
+#include <linux/init.h>       
+
+MODULE_LICENSE("GPL");
+MODULE_AUTHOR("Harshit-Choudhary");
+MODULE_DESCRIPTION("HelloWorld Linux Kernel Module."); 
+
+int pid = 0;
+module_param(pid, int, 0);
+
+static int __init info_init(void)
+{
+    struct task_struct *taskiss;
+
+    taskiss = pid_task(find_vpid(pid), PIDTYPE_PID);
+    if (!taskiss)
+    {
+        return -1;
+    }
+
+    printk("PID: %d\n", taskiss->pid);
+    printk("User ID: %d\n", taskiss->cred->uid.val);
+    printk("Process Group ID: %d\n", taskiss->pgid);
+    printk("Command Path: %s\n", taskiss->comm);
+
+    return 0;
+}
+
+
+
+static void __exit info_cleanup(void)
+{
+    printk("Cleaning up module.\n");
+}
+module_init(info_init);      
+module_exit(info_cleanup);
