@@ -42,7 +42,7 @@ int main() {
     randomStringGenerator(arrstr);
     char toBeSent[5][6];
     int receivedIndex = -1;
-    int mem = shmget(9999,100,IPC_CREAT | 0666);
+    int mem = shmget(6969,100,IPC_CREAT | 0666);
     char *ptr = (char *)shmat(mem,NULL,0);
     for (int i=0; i<10; i++) {
         getCharArrays(receivedIndex+1, toBeSent, arrstr);
