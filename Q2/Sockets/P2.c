@@ -29,7 +29,7 @@ int main(int argc, char const *argv[])
     sock = socket(AF_UNIX, SOCK_STREAM, 0);
     if (sock < 0)
     {
-        perror("Socket Opened");
+        perror("opening stream socket");
         exit(1);
     }
     server.sun_family = AF_UNIX;
@@ -37,15 +37,23 @@ int main(int argc, char const *argv[])
     if (connect(sock, (struct sockaddr *)&server, sizeof(struct sockaddr_un)) < 0)
     {
         close(sock);
-        perror("Socket Connecting\n");
+        perror("connecting stream socket");
         exit(1);
     }
     char buff[5][6];
     for (int i=0; i<10; i++) {
-        read(sock,(void*)&buff,sizeof(char)*30);
+        int y = read(sock,(void*)&buff,sizeof(char)*30);
+        if (!y) {
+            perror("Couldn't read\n");
+            exit(1);
+        }
         printCharArray(buff);
         Index = buff[4][5];
-        write(sock,&Index,sizeof(int));
+        int x = write(sock,&Index,sizeof(int));
+        if (!x) {
+            perror("Couldn't write\n");
+            exit(1);
+        }
     }
     close(sock);
     return (0);
